@@ -1,19 +1,14 @@
-use std::io::{Read, Write};
-
-use actix_multipart::{
+use actix_multipart::
     form::{
-        tempfile::{TempFile, TempFileConfig},
-        MultipartForm,
-    },
-    Multipart,
-};
-use futures::FutureExt;
+        tempfile::TempFile,
+        MultipartForm
+    }
+;
 use mongodb::bson::doc;
 
 use std::path::Path;
-use std::fs::File;
 
-use actix_web::{middleware, post, web, http, Error, HttpResponse, Responder, Result};
+use actix_web::{post, web, HttpResponse};
 use serde::{Deserialize, Serialize};
 
 use crate::utils::{database, users};
@@ -32,7 +27,8 @@ struct UploadForm {
 struct Response {
     status: i64,
     reason: Option<String>,
-    id: Option<String>
+    id: Option<String>,
+    filename: Option<String>
 }
 
 #[derive(Deserialize)]
@@ -46,7 +42,7 @@ async fn upload(info: web::Query<Info>, MultipartForm(form): MultipartForm<Uploa
     let mut filename = "".to_string();
     let mut ext = "".to_string();
 
-    let mut filesize: i64 = 0;
+    // let mut filesize: i64 = 0;
 
     let user = users::get_user(info.api_key.clone()).await;
 
@@ -54,7 +50,8 @@ async fn upload(info: web::Query<Info>, MultipartForm(form): MultipartForm<Uploa
         let obj = Response {
             status: 403,
             reason: Some("Invalid API key".to_string()),
-            id: None
+            id: None,
+            filename: None
         };
 
         return HttpResponse::Forbidden().body(serde_json::to_string(&obj).unwrap())
@@ -64,7 +61,8 @@ async fn upload(info: web::Query<Info>, MultipartForm(form): MultipartForm<Uploa
         let obj = Response {
             status: 403,
             reason: Some("Invalid type".to_string()),
-            id: None
+            id: None,
+            filename: None
         };
 
         return HttpResponse::Forbidden().body(serde_json::to_string(&obj).unwrap())
@@ -74,7 +72,8 @@ async fn upload(info: web::Query<Info>, MultipartForm(form): MultipartForm<Uploa
         let obj = Response {
             status: 403,
             reason: Some("One file at a time please".to_string()),
-            id: None
+            id: None,
+            filename: None
         }; 
 
         println!("{}", form.files.len());
@@ -101,7 +100,8 @@ async fn upload(info: web::Query<Info>, MultipartForm(form): MultipartForm<Uploa
     let obj = Response {
         status: 200,
         reason: None,
-        id: Some(filename.clone())
+        id: Some(filename.clone()),
+        filename: Some(format!("{}.{}", filename, ext))
     };
 
     

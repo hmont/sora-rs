@@ -1,0 +1,9 @@
+html {
+    background-color: #010101;
+    color: white;
+    font-family: monospace;
+}
+
+img {
+    max-width: 100%;
+}

@@ -1,11 +1,9 @@
 mod utils;
 mod endpoints;
 
-use actix_web::{web, HttpServer, App};
+use actix_web::{HttpServer, App};
 
 use actix_files as fs;
-
-use serde_json::{self, Value};
 
 use crate::utils::config::Config;
 
@@ -23,6 +21,7 @@ async fn main() -> std::io::Result<()> {
             .service(uploads::uploads)
             .service(index::index)
             .service(fs::Files::new("/files", "./files"))
+            .service(fs::Files::new("/static", "./static"))
     })
     .bind((sora_host, sora_port))?
     .run()

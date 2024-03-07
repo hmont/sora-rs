@@ -14,7 +14,6 @@ pub async fn get_user(api_key: String) -> Option<Document> {
         {
             return Some(user.clone());
         }
-
     }
 
     None

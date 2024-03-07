@@ -1,12 +1,9 @@
-use futures::Future;
-use mongodb::{bson::Document, options::HostInfo, Client, Collection};
+use mongodb::{bson::Document, Client, Collection};
 use lazy_static::lazy_static;
 
 use crate::Config;
 
 use async_once::AsyncOnce;
-
-use std::{borrow::Borrow, ptr};
 
 lazy_static! { // fuck rust
 	static ref CONFIG: config::Config = Config::load();
@@ -24,13 +21,11 @@ lazy_static! { // fuck rust
         
 		let mut __uri: String = "".to_string();
 
-		if auth_enabled
-		{
-			__uri = format!("mongodb://{}:{}@{}:{}/{}?authSource={}", username, password, host, port, database, auth_db);
-		}
+		if auth_enabled { __uri = format!("mongodb://{}:{}@{}:{}/{}?authSource={}", username, password, host, port, database, auth_db); }
+		else { __uri = format!("mongodb://{}:{}/{}", host, port, database); }
 
-		println!("{}", CONFIG.get_bool("database.authorization").unwrap().to_string());
-		println!("{}", __uri.to_string());
+		//println!("{}", CONFIG.get_bool("database.authorization").unwrap().to_string()); debugging
+		//println!("{}", __uri.to_string()); debugging
         let client = Client::with_uri_str(__uri).await.unwrap();
 
         client
