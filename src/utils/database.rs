@@ -5,7 +5,7 @@ use crate::Config;
 
 use async_once::AsyncOnce;
 
-lazy_static! { // fuck rust
+lazy_static! { // i hate rust
 	static ref CONFIG: config::Config = Config::load();
 
     static ref MONGO: AsyncOnce<Client> = AsyncOnce::new(async {
@@ -31,38 +31,6 @@ lazy_static! { // fuck rust
         client
     });
 }
-
-/*async fn create_mongo_client() -> Client 
-{
-	const HOST: String = CONFIG.get_string("database.host").unwrap();
-	const PORT: i64 = CONFIG.get_int("database.port").unwrap();
-	const DATABASE: String = CONFIG.get_string("database.db").unwrap();
-
-	const AUTH_ENABLED: bool = CONFIG.get_bool("database.authorization").unwrap();
-	const USERNAME: String = CONFIG.get_string("database.username").unwrap();
-	const PASSWORD: String = CONFIG.get_string("database.password").unwrap();
-
-
-    let mongo_connection_string = get_connection_string();
-    Client::with_uri_str(&mongo_connection_string).await.unwrap()
-}*/
-
-/*async fn get_connection_string() -> String 
-{
-    let host = CONFIG.get_string("database.host").unwrap();
-    let port = CONFIG.get_int("database.port").unwrap();
-    
-	if CONFIG.get_bool("database.authorization").unwrap()
-	{
-		let username = CONFIG.get_string("database.username").unwrap();
-		let password = CONFIG.get_string("database.password").unwrap();
-		format!("mongodb://{}:{}@{}:{}", username, password, host, port)
-	}
-	else
-	{
-		format!("mongodb://{}:{}", host, port)
-	}
-}*/
 
 pub async fn collection(coll_name: &str) -> Collection<Document>
 {
